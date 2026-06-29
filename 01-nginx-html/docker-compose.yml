@@ -1,0 +1,24 @@
+services:
+  # 起動するコンテナ部隊の名前
+  nginx:
+    # 使うDockerイメージ
+    # nginx = Nginx入り
+    # stable-alpine = Alpine Linuxベースの軽量版
+    image: nginx:stable-alpine
+
+    # 起動したコンテナに付ける名前
+    container_name: docker-web-starter-nginx-html
+
+    # ポート接続
+    # 左: ホスト側の8080番
+    # 右: コンテナ内の80番
+    # http://localhost:8080 → コンテナ内Nginxの80番へ届く
+    ports:
+      - "8080:80"
+
+    # フォルダ接続
+    # 左: 自分のPC側の ./html
+    # 右: コンテナ内のNginx公開フォルダ
+    # ro = read only。コンテナ側からは読み取り専用
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
