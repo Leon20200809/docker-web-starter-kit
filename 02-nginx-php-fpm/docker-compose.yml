@@ -1,0 +1,47 @@
+services:
+  # Webサーバー役
+  # ブラウザからのHTTPリクエストを受ける入口
+  nginx:
+    # Nginx公式イメージ
+    # stable-alpine = Alpine Linuxベースの軽量版
+    image: nginx:stable-alpine
+
+    # 起動したNginxコンテナに付ける名前
+    container_name: docker-web-starter-nginx-php
+
+    # ポート接続
+    # 左: ホスト側の8081番
+    # 右: コンテナ内Nginxの80番
+    # http://localhost:8081 → Nginxコンテナの80番へ届く
+    ports:
+      - "8081:80"
+
+    # フォルダ・ファイル接続
+    volumes:
+      # ローカルの src フォルダを、Nginxコンテナ内の公開フォルダとして見せる
+      # ro = read only。Nginx側からは読み取り専用
+      - ./src:/var/www/html:ro
+
+      # ローカルの Nginx設定ファイルを、コンテナ内の default.conf として差し替える
+      # PHPファイルをPHP-FPMへ渡すルールを書くために必要
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    # nginx は php サービスに依存する
+    # 先にPHP-FPMコンテナを起動してからNginxを起動する
+    depends_on:
+      - php
+
+  # PHP実行役
+  # Nginxから渡された .php ファイルを実行する
+  php:
+    # ./php/Dockerfile を使ってPHP-FPMコンテナを作る
+    build:
+      context: ./php
+
+    # 起動したPHP-FPMコンテナに付ける名前
+    container_name: docker-web-starter-php-fpm
+
+    # ローカルの src フォルダを、PHP-FPMコンテナにも見せる
+    # NginxとPHP-FPMが同じPHPファイルを見られるようにする
+    volumes:
+      - ./src:/var/www/html:ro
