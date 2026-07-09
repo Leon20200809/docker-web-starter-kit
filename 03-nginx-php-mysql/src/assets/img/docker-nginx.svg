@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
+  <rect width="240" height="160" rx="20" fill="#0f172a"/>
+  <circle cx="76" cy="80" r="34" fill="#22c55e"/>
+  <circle cx="164" cy="80" r="34" fill="#38bdf8"/>
+  <text x="76" y="86" font-size="18" text-anchor="middle" fill="#0f172a" font-family="Arial">NGX</text>
+  <text x="164" y="86" font-size="18" text-anchor="middle" fill="#0f172a" font-family="Arial">PHP</text>
+  <path d="M110 80 H130" stroke="#f9fafb" stroke-width="6" stroke-linecap="round"/>
+</svg>

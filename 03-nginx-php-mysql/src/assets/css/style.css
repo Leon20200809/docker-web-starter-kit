@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.wrapper {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+.card {
+  padding: 32px;
+  border: 1px solid #374151;
+  border-radius: 16px;
+  background: #1f2937;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+  display: block;
+  margin-bottom: 24px;
+}
+
+.code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #374151;
+}

@@ -1,0 +1,68 @@
+services:
+  # Webサーバー役
+  # ブラウザからのHTTPリクエストを受ける入口
+  nginx:
+    image: nginx:stable-alpine
+    container_name: 03-docker-web-starter-nginx-php-mysql
+
+    ports:
+      # ホスト側8082番 → コンテナ内Nginxの80番
+      # http://localhost:8082 で確認する
+      - "8082:80"
+
+    volumes:
+      # PHPアプリ本体をNginxコンテナに見せる
+      - ./src:/var/www/html:ro
+
+      # Nginx設定ファイルを差し替える
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    depends_on:
+      - php
+
+  # PHP実行役
+  # Nginxから渡された .php ファイルをPHP-FPMで実行する
+  php:
+    build:
+      context: ./php
+    container_name: 03-docker-web-starter-php-fpm-mysql
+
+    volumes:
+      # PHP-FPMコンテナにも同じsrcを見せる
+      # NginxとPHP-FPMで同じパスを共有するため
+      - ./src:/var/www/html:ro
+
+    depends_on:
+      - mysql
+
+  # データベース役
+  # PHPコンテナから mysql:3306 で接続する
+  mysql:
+    image: mysql:8.0
+    container_name: 03-docker-web-starter-mysql
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: starter_db
+      MYSQL_USER: starter_user
+      MYSQL_PASSWORD: starter_pass
+
+    volumes:
+      # MySQLのデータを永続化する
+      # コンテナを削除してもDBデータを残す
+      - mysql_data:/var/lib/mysql
+
+      # 初回起動時に実行するSQLを置く
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+
+    ports:
+      # 学習・確認用
+      # ホスト側からMySQLへ接続したい場合に使う
+      - "3307:3306"
+
+volumes:
+  mysql_data:
