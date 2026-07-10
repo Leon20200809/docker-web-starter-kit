@@ -1,6 +1,4 @@
-
-# WordPress runtime files
-# wordpress/ の中身は全部無視
+# 04 WordPress runtime files
 # ただし .gitkeep だけはGitに入れる
-wordpress/*
-!wordpress/.gitkeep
+/04-wordpress/wordpress/*
+!/04-wordpress/wordpress/.gitkeep
