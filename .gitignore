@@ -2,3 +2,7 @@
 # ただし .gitkeep だけはGitに入れる
 /04-wordpress/wordpress/*
 !/04-wordpress/wordpress/.gitkeep
+
+# 05 Laravel application runtime files
+/05-laravel/src/*
+!/05-laravel/src/.gitkeep

@@ -1,0 +1,97 @@
+services:
+  # Webサーバー役
+  # ブラウザからのHTTPリクエストを受ける入口
+  nginx:
+    image: nginx:stable-alpine
+    container_name: 05-nginx-LaravelApp
+
+    ports:
+      # ホスト側8082番 → コンテナ内Nginxの80番
+      # http://localhost:8083 で確認する
+      - "8083:80"
+
+    volumes:
+      # Laravelプロジェクト本体をNginxコンテナに見せる
+      # NginxはPHPを実行せず、CSS・JS・画像などを読むため :ro
+      - ./src:/var/www/html:ro
+
+      # Nginx設定ファイルを差し替える
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    depends_on:
+      - php
+
+  # PHP-FPM入りのWordPressイメージを選択
+  # WordPressはファイルを書き込むため、PHP側のWordPress本体volumeには :ro を付けない
+  php:
+    build:
+      context: ./php
+
+    container_name: 05-php-fpm-LaravelApp
+
+    # コンテナ内でコマンドを実行する時の基準位置
+    # composer や php artisan を /var/www/html で実行しやすくする
+    working_dir: /var/www/html
+
+    volumes:
+      # Laravelプロジェクト本体をPHP-FPMコンテナに見せる
+      #
+      # Laravelは以下へ書き込む必要があるため :ro は付けない
+      # - storage/
+      # - bootstrap/cache/
+      - ./src:/var/www/html
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # データベース役
+  # Laravel PHP-FPMコンテナから mysql:3306 で接続する
+  mysql:
+    image: mysql:8.0
+    container_name: 05-mysql-LaravelApp
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: laravel_db
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: laravel_pass
+
+    volumes:
+      # MySQLのDBデータをDocker volumeへ永続化する
+      #
+      # docker compose down
+      # → DBは残る
+      #
+      # docker compose down -v
+      # → DBも削除される
+      - mysql_data:/var/lib/mysql
+
+      # 初回起動時にSQLやシェルスクリプトを実行する場所
+      # 今回は .gitkeep だけ置いて空でもよい
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+
+    ports:
+      # 学習・確認用
+      # ホスト側からMySQLへ接続したい場合に使う
+      - "3308:3306"
+
+    healthcheck:
+      # MySQLコンテナ自身の中で接続確認する
+      # healthy になってから WordPress PHP-FPM を起動させる
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 300s
+
+volumes:
+  mysql_data:
