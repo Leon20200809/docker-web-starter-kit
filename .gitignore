@@ -6,3 +6,7 @@
 # 05 Laravel application runtime files
 /05-laravel/src/*
 !/05-laravel/src/.gitkeep
+
+# 07 Next.js application runtime files
+/07-nextjs/src/*
+!/07-nextjs/src/.gitkeep

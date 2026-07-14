@@ -1,0 +1,35 @@
+services:
+  next:
+    # Next.jsを動かすNode.js公式イメージ
+    image: node:24-alpine
+    container_name: 07-nextjs-app
+
+    # package.jsonを置くNext.jsプロジェクトのルート
+    working_dir: /app
+
+    # npmが作るファイルをホスト側でespo所有にする
+    user: "1000:1000"
+
+    # ホスト3000番 → Next.js開発サーバー3000番
+    ports:
+      - "3000:3000"
+
+    # Next.js本体をホスト側で編集する
+    volumes:
+      - ./src:/app
+
+    # コンテナ外から接続できる状態で開発サーバーを起動
+    command: npm run dev -- --hostname 0.0.0.0
+
+    networks:
+      default:
+
+      # 06の共通門番から接続する
+      web-gateway:
+        aliases:
+          - next-web
+
+networks:
+  # 04・05・06と共有する既存ネットワーク
+  web-gateway:
+    external: true
