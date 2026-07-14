@@ -5,6 +5,14 @@ services:
     image: nginx:stable-alpine
     container_name: 04-docker-web-starter-nginx-wordpress-mysql
 
+    networks:
+      # 04内部のPHPとの通路
+      default:
+      # 06の門番との通路
+      web-gateway:
+        aliases:
+          - wordpress-web
+
     ports:
       # ホスト側8082番 → コンテナ内Nginxの80番
       # http://localhost:8082 で確認する
@@ -101,3 +109,7 @@ services:
 
 volumes:
   mysql_data:
+
+networks:
+  web-gateway:
+    external: true

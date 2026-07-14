@@ -21,6 +21,12 @@ services:
     depends_on:
       - php
 
+    networks:
+      default:
+      web-gateway:
+        aliases:
+          - laravel-web
+
   # PHP-FPM入りのWordPressイメージを選択
   # WordPressはファイルを書き込むため、PHP側のWordPress本体volumeには :ro を付けない
   php:
@@ -106,3 +112,7 @@ services:
 
 volumes:
   mysql_data:
+
+networks:
+  web-gateway:
+    external: true
